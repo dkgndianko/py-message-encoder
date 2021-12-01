@@ -17,3 +17,6 @@ class BooleanEncoder(PartialEncoder):
     def decode(self, value: str) -> Any:
         # verify if the value is "0" or "1"
         return value == "1"
+
+    def __str__(self):
+        return "Boolean Encoder"

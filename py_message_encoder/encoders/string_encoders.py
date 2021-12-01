@@ -1,6 +1,6 @@
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
-from py_message_encoder.utilities import left_pad, right_pad
+from py_message_encoder.utilities import left_pad, right_pad, custom_base_64
 
 
 class FixedLengthEncoder(PartialEncoder):
@@ -22,12 +22,15 @@ class FixedLengthEncoder(PartialEncoder):
     def decode(self, value: str) -> str:
         return value.rstrip()
 
+    def __str__(self):
+        return f"Fixed Length String Encoder ({self._length})"
+
 
 class VariableLengthEncoder(PartialEncoder):
     def __init__(self, length_digits):
         super(VariableLengthEncoder, self).__init__(MessageType.VARIABLE_LENGTH_STRING)
         self.length_digits = length_digits
-        self._max_length = 10 ** self.length_digits - 1
+        self._max_length = custom_base_64.alphabet_len ** self.length_digits - 1
         self._max_global_length = self.length_digits + self._max_length
 
     def max_length(self):
@@ -40,6 +43,8 @@ class VariableLengthEncoder(PartialEncoder):
         _len = len(value)
         if _len > self.max_length():
             raise ValueError(f"This can only encode strings with length at most {self.max_length()}. {_len} given.")
+        # _len = hex(_len)[2:]
+        _len = custom_base_64.encode(_len)
         _len = left_pad(str(_len), self.length_digits, '0')
         return f"{_len}{value}"
 
@@ -48,14 +53,14 @@ class VariableLengthEncoder(PartialEncoder):
         if global_length < self.length_digits or global_length > (self.max_length() + self.length_digits):
             raise ValueError(f"The value should have length between {self.length_digits} and {self._max_global_length}")
         _len = value[:self.length_digits]
-        try:
-            _len = int(_len)
-        except:
-            raise ValueError()
+        _len = custom_base_64.decode(_len)
         _value = value[self.length_digits:]
         if len(_value) != _len:
-            raise ValueError()
+            raise ValueError(f"{len(_value)} != {_len}")
         return _value
+
+    def __str__(self):
+        return f"Variable Length String Encoder (length digits: {self.length_digits}, max length: {self._max_length}) "
 
 
 LVAR = VariableLengthEncoder(1)
