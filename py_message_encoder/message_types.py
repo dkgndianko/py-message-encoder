@@ -1,0 +1,8 @@
+from enum import Enum
+
+
+class MessageType(Enum):
+    BOOLEAN = "BOOLEAN"
+    INT = "INT"
+    FIXED_LENGTH_STRING = "FIXED_LENGTH_STRING"
+    VARIABLE_LENGTH_STRING = "FIXED_LENGTH_STRING"
