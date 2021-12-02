@@ -4,9 +4,9 @@ from py_message_encoder.utilities import left_pad, right_pad, custom_base_64
 
 
 class FixedLengthEncoder(PartialEncoder):
-    def __init__(self, length):
+    def __init__(self, length: int):
         super(FixedLengthEncoder, self).__init__(MessageType.FIXED_LENGTH_STRING)
-        self._length = length
+        self._length: int = length
 
     def length(self) -> int:
         return self._length
@@ -45,7 +45,7 @@ class VariableLengthEncoder(PartialEncoder):
             raise ValueError(f"This can only encode strings with length at most {self.max_length()}. {_len} given.")
         # _len = hex(_len)[2:]
         _len = custom_base_64.encode(_len)
-        _len = left_pad(str(_len), self.length_digits, '0')
+        _len = left_pad(str(_len), self.length_digits, custom_base_64.zero)
         return f"{_len}{value}"
 
     def decode(self, value: str) -> str:

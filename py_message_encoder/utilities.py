@@ -34,6 +34,14 @@ class CustomIntegerBase:
     def __call__(self, number):
         return self.encode(number)
 
+    @property
+    def zero(self):
+        return self.alphabet[0]
+
+    @property
+    def one(self):
+        return self.alphabet[self.alphabet_len - 1]
+
 
 custom_alpha = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{};'\"\\/.,?><"
 # custom_alpha = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
