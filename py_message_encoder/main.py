@@ -1,6 +1,7 @@
 from typing import List, Tuple, Any
 
 from py_message_encoder.encoders import PartialEncoder
+from py_message_encoder.encoders.float_encoders import float_encoder
 from py_message_encoder.encoders.integer_encoders import small_int, _small_int, big_int
 from .encoders.boolean_encoder import BooleanEncoder
 from .encoders.string_encoders import FixedLengthEncoder, LVAR, LLVAR, LLLVAR
@@ -15,7 +16,8 @@ def test():
         # (LLLVAR, ["Hi", "Hi team", "This is a very long text", "a long text" * 7, "This is a very long text" * 13]),
         # (small_int, [0, 23, 56, 7, 345]),
         # (_small_int, [0, 23, 56, 7, 345]),
-        (big_int, [0, 7, 9, 23, 56, 99, 100, 345, 999, 1000, 1999, 9999, 567893980834]),
+        # (big_int, [0, 7, 9, 23, 56, 99, 100, 345, 999, 1000, 1999, 9999, 567893980834]),
+        (float_encoder, [round(x, float_encoder.precision) for x in [0.0, 23434., 0.23, .23, 123.0000345, 123.124242424242424423223]]),
     ]
     for encoder, cases in test_cases:
         print(f"\n-------------------------Testing {str(encoder)} ... -----------------------------\n")
