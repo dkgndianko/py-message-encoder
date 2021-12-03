@@ -23,7 +23,7 @@ def test():
             try:
                 encoded = encoder.encode(case)
                 print(f"[ENCODE] '{case}' ({len(str(case))})    ->     '{encoded}' ({len(encoded)})")
-                decoded = encoder.decode(encoded)
+                decoded, _ = encoder.decode(encoded)
                 print(f"[DECODE] '{encoded}' ({len(encoded)})   ->    '{decoded}' ({len(str(decoded))})")
 
             except ValueError as e:

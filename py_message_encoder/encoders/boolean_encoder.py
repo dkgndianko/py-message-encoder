@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Tuple
 
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
@@ -14,9 +14,9 @@ class BooleanEncoder(PartialEncoder):
     def encode(self, value) -> str:
         return "1" if value else "0"
 
-    def decode(self, value: str) -> Any:
+    def decode_value(self, value: str) -> Tuple[bool, int]:
         # verify if the value is "0" or "1"
-        return value == "1"
+        return value == "1", 1
 
     def __str__(self):
         return "Boolean Encoder"

@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
 from py_message_encoder.utilities import left_pad, right_pad, custom_base_64
@@ -19,8 +21,8 @@ class FixedLengthEncoder(PartialEncoder):
             diff = self._length - _len
             return right_pad(value, self._length, ' ')
 
-    def decode(self, value: str) -> str:
-        return value.rstrip()
+    def decode_value(self, value: str) -> Tuple[str, int]:
+        return value.rstrip(), self._length
 
     def __str__(self):
         return f"Fixed Length String Encoder ({self._length})"
@@ -36,6 +38,9 @@ class VariableLengthEncoder(PartialEncoder):
     def max_length(self):
         return self._max_length
 
+    def min_length(self):
+        return self.length_digits
+
     def max_global_length(self):
         return self._max_global_length
 
@@ -48,16 +53,16 @@ class VariableLengthEncoder(PartialEncoder):
         _len = left_pad(str(_len), self.length_digits, custom_base_64.zero)
         return f"{_len}{value}"
 
-    def decode(self, value: str) -> str:
+    def decode_value(self, value: str) -> Tuple[str, int]:
         global_length = len(value)
-        if global_length < self.length_digits or global_length > (self.max_length() + self.length_digits):
-            raise ValueError(f"The value should have length between {self.length_digits} and {self._max_global_length}")
+        # if global_length < self.length_digits or global_length > (self.max_length() + self.length_digits):
+        #     raise ValueError(f"The value should have length between {self.length_digits} and {self._max_global_length}")
         _len = value[:self.length_digits]
         _len = custom_base_64.decode(_len)
-        _value = value[self.length_digits:]
+        _value = value[self.length_digits:_len + 1]
         if len(_value) != _len:
             raise ValueError(f"{len(_value)} != {_len}")
-        return _value
+        return _value, _len + self.length_digits
 
     def __str__(self):
         return f"Variable Length String Encoder (length digits: {self.length_digits}, max length: {self._max_length}) "

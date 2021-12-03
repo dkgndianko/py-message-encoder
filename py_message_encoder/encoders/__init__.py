@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Tuple
 
 from py_message_encoder.message_types import MessageType
 
@@ -11,15 +11,26 @@ class PartialEncoder(ABC):
     def length(self) -> int:
         return 0
 
+    def min_length(self):
+        return self.length()
+
     def max_length(self):
         return self.length()
+
+    def decode(self, value: str) -> Tuple[Any, str]:
+        _min_len = self.min_length()
+        _val_len = len(value)
+        assert _val_len >= _min_len, f"Value should at least have {_min_len} characters."
+        decoded, _len_consumed = self.decode_value(value)
+        assert (_min_len <= _len_consumed <= _val_len), f"cannot consumes less than {_min_len} or more than {_val_len} characters."
+        return decoded, value[_len_consumed:]
 
     @abstractmethod
     def encode(self, value) -> str:
         pass
 
     @abstractmethod
-    def decode(self, value: str) -> Any:
+    def decode_value(self, value: str) -> Tuple[Any, int]:
         pass
 
     def __str__(self):
