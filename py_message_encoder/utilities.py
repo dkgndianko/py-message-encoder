@@ -46,3 +46,4 @@ class CustomIntegerBase:
 custom_alpha = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{};'\"\\/.,?><"
 # custom_alpha = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 custom_base_64 = CustomIntegerBase(custom_alpha)
+custom_binary = CustomIntegerBase("01")

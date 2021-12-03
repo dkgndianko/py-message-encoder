@@ -3,11 +3,18 @@ from typing import List, Tuple, Any
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.encoders.float_encoders import float_encoder
 from py_message_encoder.encoders.integer_encoders import small_int, _small_int, big_int
+from py_message_encoder.encoders.message_header_encoder import header_encoder
+from py_message_encoder.header import MessageHeader
 from .encoders.boolean_encoder import BooleanEncoder
 from .encoders.string_encoders import FixedLengthEncoder, LVAR, LLVAR, LLLVAR
 
 
 def test():
+    message_headers = [
+        MessageHeader(7).set_presence(0).set_presence(4).set_presence(6),
+        MessageHeader(7).set_presence(4).set_presence(5).set_presence(6),
+        MessageHeader(13).set_presence(0).set_presence(6).set_presence(9).set_presence(10),
+    ]
     test_cases: List[Tuple[PartialEncoder, List[Any]]] = [
         # (BooleanEncoder(), [True, False, 0, 1, 2, 3, -1, "str", "", [1, 2], []]),
         # (FixedLengthEncoder(10), ["", "Hi @team", "This is a very long tutorial"]),
@@ -18,6 +25,7 @@ def test():
         # (_small_int, [0, 23, 56, 7, 345]),
         # (big_int, [0, 7, 9, 23, 56, 99, 100, 345, 999, 1000, 1999, 9999, 567893980834]),
         (float_encoder, [round(x, float_encoder.precision) for x in [0.0, 23434., 0.23, .23, 123.0000345, 123.124242424242424423223]]),
+        (header_encoder, message_headers),
     ]
     for encoder, cases in test_cases:
         print(f"\n-------------------------Testing {str(encoder)} ... -----------------------------\n")
