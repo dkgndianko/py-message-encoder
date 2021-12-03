@@ -8,3 +8,4 @@ class MessageType(Enum):
     VARIABLE_LENGTH_STRING = "FIXED_LENGTH_STRING"
     FLOAT = "FLOAT"
     HEADER = "HEADER"
+    BODY = "BODY"
