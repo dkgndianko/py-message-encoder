@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, time
 from typing import List, Tuple, Any
 
 from py_message_encoder.body import MessageBody
 from py_message_encoder.encoders import PartialEncoder
-from py_message_encoder.encoders.date_encoders import date_encoder
+from py_message_encoder.encoders.date_encoders import date_encoder, time_encoder
 from py_message_encoder.encoders.float_encoders import float_encoder, FloatEncoder
 from py_message_encoder.encoders.integer_encoders import small_int, _small_int, big_int
 from py_message_encoder.encoders.message_body_encoder import FieldMapping, MessageField, BodyEncoder
@@ -38,7 +38,8 @@ def test():
         #     {"last_name": "Mouhidine", "score": 34.02, "first_name": "Pathe"},
         #     {"score": 509.34}, {}
         # ]]),
-        (date_encoder, [date.fromisoformat(s) for s in ["2021-12-06", "1980-01-02", "1970-01-01", "1960-01-02"]])
+        # (date_encoder, [date.fromisoformat(s) for s in ["2021-12-06", "1980-01-02", "1970-01-01", "1960-01-02"]])
+        (time_encoder, [time.fromisoformat(s) for s in ["11:23:10", "17:34:11+02:00", "23:59:59+14:00", "00:00:00-12:00"]])
     ]
     for encoder, cases in test_cases:
         print(f"\n-------------------------Testing {str(encoder)} ... -----------------------------\n")
