@@ -42,13 +42,14 @@ EXCLUDED_ENCODERS = [
 
 
 def is_not_excluded(t):
-    t not in EXCLUDED_ENCODERS
+    return t not in EXCLUDED_ENCODERS
 
 
 class TestEncoderTypeCoverage(TestCase):
 
     def test__encoder_type_coverage(self):
         all_encoders = get_encoder_classes()
+        all_encoders = {t for t in all_encoders if is_not_excluded(t)}
         tested_encoders = get_tested_encoders()
         uncovered_encoders = all_encoders - tested_encoders
         if uncovered_encoders:
