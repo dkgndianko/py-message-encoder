@@ -11,12 +11,15 @@ class BooleanEncoder(PartialEncoder):
     def length(self) -> int:
         return 1
 
+    def can_decode(self, value: str) -> bool:
+        return isinstance(value, str) and len(value) >= 1 and value[0] in ["0", "1"]
+
     def encode(self, value) -> str:
         return "1" if value else "0"
 
     def decode_value(self, value: str) -> Tuple[bool, int]:
         # verify if the value is "0" or "1"
-        return value == "1", 1
+        return len(value) >= 1 and value[0] == "1", 1
 
     def __str__(self):
         return "Boolean Encoder"
