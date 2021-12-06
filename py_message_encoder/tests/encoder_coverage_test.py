@@ -16,12 +16,16 @@ def get_tested_encoders():
     return {t.ENCODER_CLASS for t in test_classes}
 
 
+def __is_strictly_sub_class(a, b) -> bool:
+    return inspect.isclass(a) and issubclass(a, b) and a is not b
+
+
 def _is_encoder_sub_class(t):
-    return inspect.isclass(t) and issubclass(t, PartialEncoder) and t is not PartialEncoder
+    return __is_strictly_sub_class(t, PartialEncoder)
 
 
 def _is_encoder_test_class(t):
-    return inspect.isclass(t) and issubclass(t, EncoderTest) and t is not EncoderTest
+    return __is_strictly_sub_class(t, EncoderTest) and hasattr(t, "ENCODER_CLASS") and t.ENCODER_CLASS is not None
 
 
 EXCLUDED_ENCODERS = [
