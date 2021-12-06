@@ -2,13 +2,15 @@ from typing import Tuple
 
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
-from py_message_encoder.utilities import left_pad, right_pad, custom_base_64
+from py_message_encoder.utilities import left_pad, custom_base_64
 
 
 class FixedLengthEncoder(PartialEncoder):
-    def __init__(self, length: int):
+    def __init__(self, length: int, padding_char: str = ' '):
+        assert not padding_char or len(padding_char) == 1, "Give only one character for padding"
         super(FixedLengthEncoder, self).__init__(MessageType.FIXED_LENGTH_STRING)
         self._length: int = length
+        self._padding_char = padding_char or ' '
 
     def length(self) -> int:
         return self._length
@@ -18,11 +20,10 @@ class FixedLengthEncoder(PartialEncoder):
         if _len >= self.length():
             return value[:self._length]
         else:
-            diff = self._length - _len
-            return right_pad(value, self._length, ' ')
+            return left_pad(value, self._length, self._padding_char)
 
     def decode_value(self, value: str) -> Tuple[str, int]:
-        return value.rstrip(), self._length
+        return value.lstrip(self._padding_char), self._length
 
     def __str__(self):
         return f"Fixed Length String Encoder ({self._length})"
@@ -48,15 +49,11 @@ class VariableLengthEncoder(PartialEncoder):
         _len = len(value)
         if _len > self.max_length():
             raise ValueError(f"This can only encode strings with length at most {self.max_length()}. {_len} given.")
-        # _len = hex(_len)[2:]
         _len = custom_base_64.encode(_len)
         _len = left_pad(str(_len), self.length_digits, custom_base_64.zero)
         return f"{_len}{value}"
 
     def decode_value(self, value: str) -> Tuple[str, int]:
-        global_length = len(value)
-        # if global_length < self.length_digits or global_length > (self.max_length() + self.length_digits):
-        #     raise ValueError(f"The value should have length between {self.length_digits} and {self._max_global_length}")
         _len = value[:self.length_digits]
         _len = custom_base_64.decode(_len)
         _value = value[self.length_digits:_len + 1]
