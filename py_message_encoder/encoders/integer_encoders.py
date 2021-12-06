@@ -16,7 +16,7 @@ class CappedValue:
 
 class _IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
     def __init__(self, max_value: int):
-        super(_IntFixedLengthEncoder, self).__init__(len(str(max_value)))
+        super(_IntFixedLengthEncoder, self).__init__(len(str(max_value)), '0')
         self.message_type = MessageType.INT
         CappedValue.__init__(self, max_value)
 
@@ -34,7 +34,7 @@ class _IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
 
 class IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
     def __init__(self, max_value: int):
-        super(IntFixedLengthEncoder, self).__init__(len(str(max_value)))
+        super(IntFixedLengthEncoder, self).__init__(len(str(max_value)), custom_base_64.zero)
         self.message_type = MessageType.INT
         CappedValue.__init__(self, max_value)
 
