@@ -14,7 +14,7 @@ class BooleanEncoder(PartialEncoder):
     def can_decode(self, value: str) -> bool:
         return isinstance(value, str) and len(value) >= 1 and value[0] in ["0", "1"]
 
-    def encode(self, value) -> str:
+    def encode_value(self, value) -> str:
         return "1" if value else "0"
 
     def decode_value(self, value: str) -> Tuple[bool, int]:

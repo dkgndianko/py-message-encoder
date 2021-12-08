@@ -1,46 +1,58 @@
-from typing import Tuple
+from typing import Tuple, Any
 
 from py_message_encoder.encoders.string_encoders import VariableLengthEncoder, FixedLengthEncoder
 from py_message_encoder.message_types import MessageType
 from py_message_encoder.utilities import custom_base_64
 
 
-class CappedValue:
+class CappedIntMixin:
     def __init__(self, max_value):
         self.max_value = max_value
+        self.message_type = MessageType.INT
 
     def check_bound(self, value):
         if value > self.max_value:
             raise ValueError(f"The value is greater that {self.max_value}")
 
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        try:
+            assert isinstance(value, int), "Cannot encode non int values"
+            self.check_bound(value)
+        except (ValueError, AssertionError) as e:
+            return False, str(e)
+        else:
+            return True, ""
 
-class _IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
+
+class _IntFixedLengthEncoder(FixedLengthEncoder, CappedIntMixin):
     def __init__(self, max_value: int):
         super(_IntFixedLengthEncoder, self).__init__(len(str(max_value)), '0')
-        self.message_type = MessageType.INT
-        CappedValue.__init__(self, max_value)
+        CappedIntMixin.__init__(self, max_value)
 
-    def encode(self, value: int) -> str:
-        self.check_bound(value)
-        return super(_IntFixedLengthEncoder, self).encode(str(value))
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        return CappedIntMixin.can_encode(self, value)
+
+    def encode_value(self, value: int) -> Tuple[bool, str]:
+        return super(_IntFixedLengthEncoder, self).encode_value(str(value))
 
     def decode_value(self, value: str) -> Tuple[int, int]:
-        _val = super(_IntFixedLengthEncoder, self).decode_value(value)
-        return int(_val), self.length()
+        _val, consumed = super(_IntFixedLengthEncoder, self).decode_value(value)
+        return int(_val), consumed
 
     def __str__(self):
         return f"Integer with fixed length encoder (max: {self.max_value}, length: {self.length()})"
 
 
-class IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
+class IntFixedLengthEncoder(FixedLengthEncoder, CappedIntMixin):
     def __init__(self, max_value: int):
         super(IntFixedLengthEncoder, self).__init__(len(str(max_value)), custom_base_64.zero)
-        self.message_type = MessageType.INT
-        CappedValue.__init__(self, max_value)
+        CappedIntMixin.__init__(self, max_value)
 
-    def encode(self, value: int) -> str:
-        self.check_bound(value)
-        return super(IntFixedLengthEncoder, self).encode(custom_base_64.encode(value))
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        return CappedIntMixin.can_encode(self, value)
+
+    def encode_value(self, value: int) -> str:
+        return super(IntFixedLengthEncoder, self).encode_value(custom_base_64.encode(value))
 
     def decode_value(self, value: str) -> Tuple[int, int]:
         _val = super(IntFixedLengthEncoder, self).decode_value(value)
@@ -50,13 +62,17 @@ class IntFixedLengthEncoder(FixedLengthEncoder, CappedValue):
         return f"Integer base64 encoded with fixed length encoder (max: {self.max_value}, length: {self.length()})"
 
 
-class IntegerVarLengthEncoder(VariableLengthEncoder):
-    def __init__(self,):
-        super(IntegerVarLengthEncoder, self).__init__(1)
-        self.message_type = MessageType.INT
+class IntegerVarLengthEncoder(VariableLengthEncoder, CappedIntMixin):
+    def __init__(self):
+        len_digits = 1
+        super(IntegerVarLengthEncoder, self).__init__(len_digits)
+        CappedIntMixin.__init__(self, custom_base_64.max_encodable_with_len(self._max_length))
 
-    def encode(self, value: int) -> str:
-        return super(IntegerVarLengthEncoder, self).encode(custom_base_64.encode(value))
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        return CappedIntMixin.can_encode(self, value)
+
+    def encode_value(self, value: int) -> str:
+        return super(IntegerVarLengthEncoder, self).encode_value(custom_base_64.encode(value))
 
     def decode_value(self, value: str) -> Tuple[int, int]:
         _val, _consumed = super(IntegerVarLengthEncoder, self).decode_value(value)

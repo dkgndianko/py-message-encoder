@@ -14,9 +14,12 @@ class DateEncoder(PartialEncoder):
     def __init__(self):
         super(DateEncoder, self).__init__(MessageType.DATE)
 
-    def encode(self, value: date) -> str:
+    def encode_value(self, value: date) -> str:
         total_days = (value - REFERENCE_DATE).days
         return big_int.encode(total_days)
+
+    def can_decode(self, value: str) -> bool:
+        return big_int.can_decode(value)
 
     def decode_value(self, value: str) -> Tuple[date, int]:
         total_days, consumed = big_int.decode_value(value)
@@ -28,7 +31,7 @@ class TimeEncoder(PartialEncoder):
     def __init__(self):
         super(TimeEncoder, self).__init__(MessageType.TIME)
 
-    def encode(self, value: time) -> str:
+    def encode_value(self, value: time) -> str:
         seconds = value.hour * 3600 + value.minute * 60 + value.second
         offset_encoded = encode_offset(value.utcoffset())
         return offset_encoded + big_int.encode(seconds)
@@ -46,7 +49,7 @@ class DateTimeEncoder(PartialEncoder):
     def __init__(self):
         super(DateTimeEncoder, self).__init__(MessageType.DATE_TIME)
 
-    def encode(self, value: datetime) -> str:
+    def encode_value(self, value: datetime) -> str:
         offset_encoded = encode_offset(value.utcoffset())
         total_seconds = int((value.replace(tzinfo=None) - REFERENCE_DATETIME).total_seconds())
         return offset_encoded + big_int.encode(total_seconds)

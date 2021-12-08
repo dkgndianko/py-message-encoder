@@ -16,7 +16,7 @@ class MessageHeaderEncoder(PartialEncoder):
     def min_length(self) -> int:
         return self._min_length
 
-    def encode(self, value: MessageHeader) -> str:
+    def encode_value(self, value: MessageHeader) -> str:
         _len = value.number_of_parts
         _value_dumped = value.dump()
         _dump_int = custom_binary.decode(_value_dumped)

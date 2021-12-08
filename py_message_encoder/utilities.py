@@ -47,6 +47,9 @@ class CustomIntegerBase:
             result *= -1
         return result
 
+    def max_encodable_with_len(self, target_len: int) -> int:
+        return self.decode(self.alphabet[-2] + self.one * (target_len - 1))
+
     def __call__(self, number):
         return self.encode(number)
 
@@ -56,7 +59,7 @@ class CustomIntegerBase:
 
     @property
     def one(self):
-        return self.alphabet[self.alphabet_len - 1]
+        return self.alphabet[-1]
 
 
 custom_alpha = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{};'\"\\/.,?><"

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Any
 
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.encoders.integer_encoders import big_int
@@ -12,7 +12,10 @@ class FloatEncoder(PartialEncoder):
         super(FloatEncoder, self).__init__(MessageType.FLOAT)
         self.precision = precision
 
-    def encode(self, value: float) -> str:
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        return isinstance(value, float), "Can only encode floats"
+
+    def encode_value(self, value: float) -> str:
         value = round(value, self.precision)
         _decimal_part = ""
         if value.is_integer():

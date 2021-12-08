@@ -1,11 +1,20 @@
-from typing import Tuple
+from typing import Tuple, Any
 
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
 from py_message_encoder.utilities import left_pad, custom_base_64
 
 
-class FixedLengthEncoder(PartialEncoder):
+class StringEncoderMixin:
+
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        if isinstance(value, str) and len(value) <= self.max_length():
+            return True, ""
+        else:
+            return False, f"This can only encode strings with length at most {self.max_length()}."
+
+
+class FixedLengthEncoder(PartialEncoder, StringEncoderMixin):
     def __init__(self, length: int, padding_char: str = ' '):
         assert not padding_char or len(padding_char) == 1, "Give only one character for padding"
         super(FixedLengthEncoder, self).__init__(MessageType.FIXED_LENGTH_STRING)
@@ -15,7 +24,7 @@ class FixedLengthEncoder(PartialEncoder):
     def length(self) -> int:
         return self._length
 
-    def encode(self, value: str) -> str:
+    def encode_value(self, value: str) -> str:
         _len = len(value)
         if _len >= self.length():
             return value[:self._length]
@@ -29,7 +38,7 @@ class FixedLengthEncoder(PartialEncoder):
         return f"Fixed Length String Encoder ({self._length})"
 
 
-class VariableLengthEncoder(PartialEncoder):
+class VariableLengthEncoder(PartialEncoder, StringEncoderMixin):
     def __init__(self, length_digits):
         super(VariableLengthEncoder, self).__init__(MessageType.VARIABLE_LENGTH_STRING)
         self.length_digits = length_digits
@@ -45,11 +54,8 @@ class VariableLengthEncoder(PartialEncoder):
     def max_global_length(self):
         return self._max_global_length
 
-    def encode(self, value: str) -> str:
-        _len = len(value)
-        if _len > self.max_length():
-            raise ValueError(f"This can only encode strings with length at most {self.max_length()}. {_len} given.")
-        _len = custom_base_64.encode(_len)
+    def encode_value(self, value: str) -> str:
+        _len = custom_base_64.encode(len(value))
         _len = left_pad(str(_len), self.length_digits, custom_base_64.zero)
         return f"{_len}{value}"
 

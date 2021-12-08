@@ -11,6 +11,11 @@ class PartialEncoder(ABC):
     def length(self) -> int:
         return 0
 
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        if isinstance(value, self.message_type.target_type):
+            return True, ""
+        return False, f"Can only encode {self.message_type.target_type.__class_}"
+
     def min_length(self):
         return self.length()
 
@@ -29,8 +34,14 @@ class PartialEncoder(ABC):
         assert (_min_len <= _len_consumed <= _val_len), f"cannot consumes less than {_min_len} or more than {_val_len} characters."
         return decoded, value[_len_consumed:]
 
-    @abstractmethod
     def encode(self, value) -> str:
+        _can, error = self.can_encode(value)
+        if _can is False:
+            raise ValueError(error or "Cannot encode this value")
+        return self.encode_value(value)
+
+    @abstractmethod
+    def encode_value(self, value) -> str:
         pass
 
     @abstractmethod
@@ -38,4 +49,4 @@ class PartialEncoder(ABC):
         pass
 
     def __str__(self):
-        return ""
+        return f"{self.message_type} Encoder"

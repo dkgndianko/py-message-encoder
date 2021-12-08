@@ -36,7 +36,7 @@ class BodyEncoder(PartialEncoder):
         self.field_mapping = field_mapping
         self.fields_count = self.field_mapping.fields_count()
 
-    def encode(self, value: MessageBody) -> str:
+    def encode_value(self, value: MessageBody) -> str:
         header = MessageHeader(value.fields_count())
         index = 0
         body = ""
