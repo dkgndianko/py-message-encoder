@@ -14,7 +14,7 @@ class StringEncoderMixin:
             return False, f"This can only encode strings with length at most {self.max_length()}."
 
 
-class FixedLengthEncoder(PartialEncoder, StringEncoderMixin):
+class FixedLengthEncoder(StringEncoderMixin, PartialEncoder):
     def __init__(self, length: int, padding_char: str = ' '):
         assert not padding_char or len(padding_char) == 1, "Give only one character for padding"
         super(FixedLengthEncoder, self).__init__(MessageType.FIXED_LENGTH_STRING)
@@ -32,7 +32,7 @@ class FixedLengthEncoder(PartialEncoder, StringEncoderMixin):
             return left_pad(value, self._length, self._padding_char)
 
     def decode_value(self, value: str) -> Tuple[str, int]:
-        return value.lstrip(self._padding_char), self._length
+        return value[: self._length].lstrip(self._padding_char), self._length
 
     def __str__(self):
         return f"Fixed Length String Encoder ({self._length})"
