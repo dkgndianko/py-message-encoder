@@ -58,11 +58,11 @@ class EncoderTest(TestCase):
             can = False
         return can
 
-    def assertCanDecode(self, value: Any, message: str, flavor=None):
-        self.assertTrue(self._can_decode(value, flavor), message)
+    def assertCanDecode(self, value: Any, message: str = None, flavor=None):
+        self.assertTrue(self._can_decode(value, flavor), message or "Expect to be able to decode the value")
 
-    def assertCannotDecode(self, value: Any, message: str, flavor=None):
-        self.assertFalse(self._can_decode(value, flavor), message)
+    def assertCannotDecode(self, value: Any, message: str = None, flavor=None):
+        self.assertFalse(self._can_decode(value, flavor), message or "Expecting to not be able to decode the value")
 
     def assertShouldEncodeDecodeMismatch(self, value: Any, message: str, flavor=None):
         pass
@@ -71,8 +71,9 @@ class EncoderTest(TestCase):
         with self.assertRaises(expected_exception, msg=message):
             self.get_encoder(flavor).encode(value)
 
-    def assertShouldRaiseDecoding(self, payload: str, message: str, flavor=None):
-        pass
+    def assertShouldRaiseWhenDecoding(self, payload: str, expected_exception, message: str = None, flavor=None):
+        with self.assertRaises(expected_exception, msg=message):
+            self.get_encoder(flavor).decode(payload)
 
 
 def with_flavor(flavor: int):
