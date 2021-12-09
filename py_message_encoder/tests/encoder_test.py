@@ -7,18 +7,20 @@ from py_message_encoder.encoders import PartialEncoder
 class EncoderTest(TestCase):
     ENCODER_CLASS = None
     FLAVORS: List[Tuple] = []  # list of different argument cases to pass to the __init__ method of the encoder class
-    __INSTANCES = {}
     CURRENT_FLAVOR = ()
 
-    def __get_instance_with_flavor(self, flavor=None):
+    @classmethod
+    def __get_instance_with_flavor(cls, flavor=None):
+        if hasattr(cls, 'INSTANCES') is False:
+            cls.INSTANCES = {}
         if flavor is None:
-            flavor = self.CURRENT_FLAVOR
+            flavor = cls.CURRENT_FLAVOR
         _flavor = hash(flavor)
         try:
-            instance = self.__INSTANCES[_flavor]
+            instance = cls.INSTANCES[_flavor]
         except KeyError:
-            instance = self.ENCODER_CLASS(*flavor)
-            self.__INSTANCES[_flavor] = instance
+            instance = cls.ENCODER_CLASS(*flavor)
+            cls.INSTANCES[_flavor] = instance
         return instance
 
     def get_encoder(self, flavor=None) -> PartialEncoder:
@@ -58,8 +60,19 @@ class EncoderTest(TestCase):
             can = False
         return can
 
-    def assertCanDecode(self, value: Any, message: str = None, flavor=None):
-        self.assertTrue(self._can_decode(value, flavor), message or "Expect to be able to decode the value")
+    def _can_encode(self, value: Any, flavor=None) -> bool:
+        can, me = self.get_encoder(flavor).can_encode(value)
+        print(f"me: {me}")
+        return can
+
+    def assertCanEncode(self, value: Any, message: str = None, flavor=None):
+        self.assertTrue(self._can_encode(value, flavor), message or "Expecting to be able to encode the value")
+
+    def assertCannotEncode(self, value: Any, message: str = None, flavor=None):
+        self.assertFalse(self._can_encode(value, flavor), message or "Expecting to not be able to encode the value")
+
+    def assertCanDecode(self, value: Any, message: str, flavor=None):
+        self.assertTrue(self._can_decode(value, flavor), message or "Expecting to be able to decode the value")
 
     def assertCannotDecode(self, value: Any, message: str = None, flavor=None):
         self.assertFalse(self._can_decode(value, flavor), message or "Expecting to not be able to decode the value")
@@ -80,15 +93,16 @@ def with_flavor(flavor: int):
     def annotation(method):
 
         def new_method(self: EncoderTest):
-            flavor_backup = self.CURRENT_FLAVOR
+            clazz = type(self)
+            flavor_backup = clazz.CURRENT_FLAVOR
             try:
-                self.CURRENT_FLAVOR = self.FLAVORS[flavor]
+                clazz.CURRENT_FLAVOR = clazz.FLAVORS[flavor]
             except IndexError:
                 raise ValueError(f"Not such flavor at index {flavor}")
             try:
                 method(self)
             finally:
-                self.CURRENT_FLAVOR = flavor_backup
+                clazz.CURRENT_FLAVOR = flavor_backup
 
         return new_method
 
