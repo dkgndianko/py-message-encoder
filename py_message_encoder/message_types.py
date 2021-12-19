@@ -9,7 +9,7 @@ class MessageType(Enum):
     BOOLEAN = ("BOOLEAN", bool)
     INT = ("INT", int)
     FIXED_LENGTH_STRING = ("FIXED_LENGTH_STRING", str)
-    VARIABLE_LENGTH_STRING = ("FIXED_LENGTH_STRING", str)
+    VARIABLE_LENGTH_STRING = ("VARIABLE_LENGTH_STRING", str)
     FLOAT = ("FLOAT", float)
     DATE = ("DATE", date)
     DATE_TIME = ("DATE_TIME", datetime)

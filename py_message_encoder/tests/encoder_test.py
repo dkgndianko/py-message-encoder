@@ -61,8 +61,7 @@ class EncoderTest(TestCase):
         return can
 
     def _can_encode(self, value: Any, flavor=None) -> bool:
-        can, me = self.get_encoder(flavor).can_encode(value)
-        print(f"me: {me}")
+        can, _ = self.get_encoder(flavor).can_encode(value)
         return can
 
     def assertCanEncode(self, value: Any, message: str = None, flavor=None):
@@ -71,7 +70,7 @@ class EncoderTest(TestCase):
     def assertCannotEncode(self, value: Any, message: str = None, flavor=None):
         self.assertFalse(self._can_encode(value, flavor), message or "Expecting to not be able to encode the value")
 
-    def assertCanDecode(self, value: Any, message: str, flavor=None):
+    def assertCanDecode(self, value: Any, message: str = None, flavor=None):
         self.assertTrue(self._can_decode(value, flavor), message or "Expecting to be able to decode the value")
 
     def assertCannotDecode(self, value: Any, message: str = None, flavor=None):
