@@ -6,7 +6,7 @@ from py_message_encoder.header import MessageHeader
 
 
 class MessageType(Enum):
-    BOOLEAN = ("BOOLEAN", bool)
+    BOOLEAN = ("BOOLEAN", object)
     INT = ("INT", int)
     FIXED_LENGTH_STRING = ("FIXED_LENGTH_STRING", str)
     VARIABLE_LENGTH_STRING = ("VARIABLE_LENGTH_STRING", str)

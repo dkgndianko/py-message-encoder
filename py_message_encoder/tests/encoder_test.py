@@ -37,19 +37,19 @@ class EncoderTest(TestCase):
         decoded, _ = instance.decode(payload)
         self.assertEqual(decoded, expected, message or f"Cannot decode '{payload}' to {instance.message_type} {expected}")
 
-    def assertShouldEncodeDecodeMatch(self, payload: str, message: str = None, flavor=None):
+    def assertShouldEncodeDecodeMatch(self, payload: Any, message: str = None, flavor=None):
         instance = self.get_encoder(flavor)
         encoded = instance.encode(payload)
         decoded, consumed = instance.decode(encoded)
         self.assertEqual(decoded, payload, message or "Encode -> Decode not giving the same value")
 
-    def assertShouldFailEncoding(self, payload: str, unexpected: Any, message: str, flavor=None):
+    def assertShouldFailEncoding(self, payload: Any, unexpected: Any, message: str = None, flavor=None):
         instance = self.get_encoder(flavor)
         encoded = instance.encode(payload)
         self.assertNotEqual(encoded, unexpected, message or f"Not expected to encode {instance.message_type} '{payload}"
                                                             f"' to '{unexpected}'")
 
-    def assertShouldFailDecoding(self, payload: str, unexpected: Any, message: str, flavor=None):
+    def assertShouldFailDecoding(self, payload: str, unexpected: Any, message: str = None, flavor=None):
         decoded, _ = self.get_encoder(flavor).decode(payload)
         self.assertNotEqual(decoded, unexpected, message or f"Not expected to decode '{payload}' to {unexpected}")
 
@@ -61,7 +61,8 @@ class EncoderTest(TestCase):
         return can
 
     def _can_encode(self, value: Any, flavor=None) -> bool:
-        can, _ = self.get_encoder(flavor).can_encode(value)
+        can, me = self.get_encoder(flavor).can_encode(value)
+        print(f"me: {me}")
         return can
 
     def assertCanEncode(self, value: Any, message: str = None, flavor=None):
@@ -76,8 +77,23 @@ class EncoderTest(TestCase):
     def assertCannotDecode(self, value: Any, message: str = None, flavor=None):
         self.assertFalse(self._can_decode(value, flavor), message or "Expecting to not be able to decode the value")
 
-    def assertShouldEncodeDecodeMismatch(self, value: Any, message: str, flavor=None):
-        pass
+    def assertShouldEncodeDecodeMismatch(self, payload: Any, message: str = None, flavor=None):
+        instance = self.get_encoder(flavor)
+        encoded = instance.encode(payload)
+        decoded, consumed = instance.decode(encoded)
+        self.assertNotEqual(decoded, payload, message or "Encode -> Decode not expected to give the same value")
+
+    def assertShouldDecodeEncodeMatch(self, value: str, message: str = None, flavor=None):
+        instance = self.get_encoder(flavor)
+        decoded, _ = instance.decode(value)
+        encoded = instance.encode(decoded)
+        self.assertEqual(encoded, value, message or "Decode -> Encode not giving the same value")
+
+    def assertShouldDecodeEncodeMismatch(self, value: str, message: str = None, flavor=None):
+        instance = self.get_encoder(flavor)
+        decoded, _ = instance.decode(value)
+        encoded = instance.encode(decoded)
+        self.assertNotEqual(encoded, value, message or "Decode -> Encode not expected to give the same value")
 
     def assertShouldRaiseWhenEncoding(self, value: Any, expected_exception, message: str = None, flavor=None):
         with self.assertRaises(expected_exception, msg=message):
