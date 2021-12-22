@@ -43,7 +43,7 @@ class VariableLengthEncoder(StringEncoderMixin, PartialEncoder):
         assert length_digits > 0, "Length should be greater than 0"
         PartialEncoder.__init__(self, MessageType.VARIABLE_LENGTH_STRING)
         self.length_digits = length_digits
-        self._max_length = custom_base_64.alphabet_len ** self.length_digits - 1
+        self._max_length = custom_base_64.max_encodable_with_len(self.length_digits)
         self._max_global_length = self.length_digits + self._max_length
 
     def max_length(self):

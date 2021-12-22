@@ -65,8 +65,7 @@ class IntFixedLengthEncoder(FixedLengthEncoder, CappedIntMixin):
 
 
 class IntegerVarLengthEncoder(VariableLengthEncoder, CappedIntMixin):
-    def __init__(self):
-        len_digits = 1
+    def __init__(self, len_digits: int = 1):
         super(IntegerVarLengthEncoder, self).__init__(len_digits)
         max_encodable = custom_base_64.max_encodable_with_len(self._max_length)
         CappedIntMixin.__init__(self, -max_encodable, max_encodable)
@@ -85,6 +84,6 @@ class IntegerVarLengthEncoder(VariableLengthEncoder, CappedIntMixin):
         return f"Integer with variable length encoder (length digits: {self.length_digits}, max length: {self._max_length})"
 
 
-small_int = IntFixedLengthEncoder(255)
-_small_int = _IntFixedLengthEncoder(255)
+small_int = IntFixedLengthEncoder(2)
+_small_int = _IntFixedLengthEncoder(2)
 big_int = IntegerVarLengthEncoder()

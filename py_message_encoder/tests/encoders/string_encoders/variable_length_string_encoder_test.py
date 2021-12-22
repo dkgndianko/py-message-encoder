@@ -19,6 +19,7 @@ class VariableLengthEncoderTest(EncoderTest):
         self.assertShouldEncodeSuccess("This is a small text", "kThis is a small text")
         self.assertShouldEncodeSuccess("This is a small text", "0kThis is a small text", flavor=(2,))
         self.assertShouldRaiseWhenEncoding("This is a medium text" * 13, ValueError)
+        self.assertShouldEncodeSuccess("", "0")
 
     @with_flavor(2)
     def test_can_decode(self):
@@ -32,3 +33,5 @@ class VariableLengthEncoderTest(EncoderTest):
     def test_decode(self):
         self.assertShouldRaiseWhenDecoding("kThis is a small text", ValueError)
         self.assertShouldDecodeSuccess("kThis is a small text", "This is a small text", flavor=(1,))
+        self.assertShouldDecodeSuccess("00", "")
+        self.assertShouldRaiseWhenDecoding("0", (ValueError, AssertionError))

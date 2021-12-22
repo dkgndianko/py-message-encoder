@@ -32,7 +32,7 @@ class CustomIntegerBase:
 
     def decode(self, encoded: str) -> int:
         if encoded == "":
-            pass
+            return 0
         result = 0
         is_negative = False
         if encoded[0] == self.one:
