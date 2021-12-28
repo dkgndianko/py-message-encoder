@@ -102,5 +102,6 @@ class IntegerVarLengthEncoder(VariableLengthEncoder, CappedIntMixin):
 
 small_int = IntFixedLengthEncoder(2)
 unsigned_tiny_int = UnsignedIntFixedLengthEncoder(1)
+unsigned_small_int = UnsignedIntFixedLengthEncoder(2)
 _small_int = _IntFixedLengthEncoder(2)
 big_int = IntegerVarLengthEncoder()
