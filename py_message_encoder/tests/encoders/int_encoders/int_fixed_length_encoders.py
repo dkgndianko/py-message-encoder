@@ -1,5 +1,5 @@
 from py_message_encoder.encoders.integer_encoders import IntFixedLengthEncoder, \
-    _IntFixedLengthEncoder
+    _IntFixedLengthEncoder, UnsignedIntFixedLengthEncoder
 from py_message_encoder.tests.encoder_test import EncoderTest, with_flavor
 
 
@@ -55,19 +55,21 @@ class IntFixedLengthEncoderTest(EncoderTest):
 
     @with_flavor(0)
     def test_can_encode(self):
-        self.assertCanEncode(674821)  # 720899
+        self.assertCanEncode(674821)
         self.assertCanEncode(89873)
         self.assertCanEncode(-89873)
         self.assertCannotEncode(3.14)
         self.assertCannotEncode("24")
         self.assertCannotEncode([12, 34])
         self.assertCanEncode(5839289999, flavor=(5,))
+        self.assertCannotEncode(5904899999, flavor=(5,))
         self.assertCannotEncode(58392810000, flavor=(5,))
 
     @with_flavor(1)
     def test_encode(self):
         self.assertShouldEncodeSuccess(20211219, "0r$j9")
         self.assertShouldEncodeSuccess(5839289999, "><<<<")
+        self.assertShouldRaiseWhenEncoding(5904899999, ValueError)
         self.assertShouldEncodeSuccess(2021121914, "u_Fke")
         self.assertShouldEncodeSuccess(-5032390, "<6'pE")
         self.assertShouldEncodeSuccess(-5032390, "00000<6'pE", flavor=(10,))
@@ -86,3 +88,46 @@ class IntFixedLengthEncoderTest(EncoderTest):
         self.assertShouldDecodeSuccess("Cidemia", 20301909515830, flavor=(7,))
         self.assertShouldFailDecoding("10001", 10001)
         self.assertShouldRaiseWhenDecoding("VDN|A", ValueError)
+
+
+class UnsignedIntFixedLengthEncoderTest(EncoderTest):
+    ENCODER_CLASS = UnsignedIntFixedLengthEncoder
+    FLAVORS = [(3,), (5,)]
+
+    @with_flavor(0)
+    def test_can_encode(self):
+        self.assertCanEncode(720899)
+        self.assertCanEncode(89873)
+        self.assertCannotEncode(-89873)
+        self.assertCanEncode(0)
+        self.assertCannotEncode(3.14)
+        self.assertCannotEncode("24")
+        self.assertCannotEncode([12, 34])
+        self.assertCanEncode(5839289999, flavor=(5,))
+        self.assertCanEncode(5904899999, flavor=(5,))
+        self.assertCannotEncode(58392810000, flavor=(5,))
+
+    @with_flavor(1)
+    def test_encode(self):
+        self.assertShouldEncodeSuccess(20211219, "0r$j9")
+        self.assertShouldEncodeSuccess(5839289999, "><<<<")
+        self.assertShouldEncodeSuccess(5904899999, "<<<<<")
+        self.assertShouldEncodeSuccess(2021121914, "u_Fke")
+        self.assertShouldRaiseWhenEncoding(-5032390, ValueError)
+        self.assertShouldRaiseWhenEncoding(-5032390, ValueError, flavor=(10,))
+        self.assertShouldRaiseWhenEncoding(58392810000, ValueError)
+
+    @with_flavor(0)
+    def test_can_decode(self):
+        self.assertCanDecode("000")
+        self.assertCannotDecode("00")
+        self.assertCannotDecode([45, 45])
+
+    @with_flavor(1)
+    def test_decode(self):
+        self.assertShouldDecodeSuccess("Cidem", 2506408582)
+        self.assertShouldDecodeSuccess("Cidemia", 2506408582)
+        self.assertShouldDecodeSuccess("Cidemia", 20301909515830, flavor=(7,))
+        self.assertShouldFailDecoding("10001", 10001)
+        self.assertShouldRaiseWhenDecoding("VDN|A", ValueError)
+

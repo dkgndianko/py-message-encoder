@@ -73,6 +73,7 @@ class IntFixedLengthEncoder(IntFixedLengthEncoderMixin):
 class UnsignedIntFixedLengthEncoder(IntFixedLengthEncoderMixin):
     def __init__(self, length: int):
         super(UnsignedIntFixedLengthEncoder, self).__init__(length, custom_unsigned_base_64)
+        self.min_value = 0
 
     def __str__(self):
         return f"Unsigned Integer base64 encoded with fixed length encoder (max: {self.max_value}, length: " \
