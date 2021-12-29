@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 from py_message_encoder.body import MessageBody
 from py_message_encoder.encoders import PartialEncoder
@@ -24,7 +24,7 @@ class FieldMapping:
         self.names = self.field_mapping.keys()
 
     def items(self):
-        return  self.field_mapping.items()
+        return self.field_mapping.items()
 
     def fields_count(self):
         return len(self.names)
@@ -36,15 +36,18 @@ class BodyEncoder(PartialEncoder):
         self.field_mapping = field_mapping
         self.fields_count = self.field_mapping.fields_count()
 
-    def encode_value(self, value: MessageBody) -> str:
+    def encode_value(self, value: Union[MessageBody, dict]) -> str:
+        if isinstance(value, dict):
+            value = MessageBody(list(self.field_mapping.names), value)
         header = MessageHeader(value.fields_count())
         index = 0
         body = ""
         for name, encoder in self.field_mapping.items():
             try:
                 data = value[name]
-                header.set_presence(index, True)
-                body += encoder.encode(data)
+                if encoder.accepts_none() or data is not None:
+                    header.set_presence(index, True)
+                    body += encoder.encode(data)
             except KeyError:
                 pass
             index += 1
@@ -60,11 +63,17 @@ class BodyEncoder(PartialEncoder):
         consumed = consumed_header
         for name, encoder in self.field_mapping.items():
             if header.is_present(index):
-                part, consumed_by_part = encoder.decode_value(value[consumed:])
+                try:
+                    part, consumed_by_part = encoder.decode_value(value[consumed:])
+                except ValueError as ve:
+                    raise ValueError(f"Error when trying to decode '{name}': {ve}") from ve
                 consumed += consumed_by_part
                 body[name] = part
             index += 1
         return body, consumed
+
+    def can_decode(self, value: str) -> bool:
+        return header_encoder.can_decode(value)
 
     def __str__(self):
         return f"Message Body Encoder (fields: {list(self.field_mapping.names)})"

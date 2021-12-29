@@ -14,7 +14,7 @@ class PartialEncoder(ABC):
     def can_encode(self, value: Any) -> Tuple[bool, str]:
         if isinstance(value, self.message_type.target_type):
             return True, ""
-        return False, f"Can only encode {self.message_type.target_type.__name__}"
+        return False, f"Can only encode {self.message_type.target_type_name}"
 
     def min_length(self):
         return self.length()
@@ -39,6 +39,9 @@ class PartialEncoder(ABC):
         if _can is False:
             raise ValueError(error or "Cannot encode this value")
         return self.encode_value(value)
+
+    def accepts_none(self):
+        return False
 
     @abstractmethod
     def encode_value(self, value) -> str:

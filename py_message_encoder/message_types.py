@@ -15,7 +15,7 @@ class MessageType(Enum):
     DATE_TIME = ("DATE_TIME", datetime)
     TIME = ("TIME", time)
     HEADER = ("HEADER", MessageHeader)
-    BODY = ("BODY", MessageBody)
+    BODY = ("BODY", (MessageBody, dict))
     LIST = ("LIST", list)
 
     def __str__(self):
@@ -24,3 +24,11 @@ class MessageType(Enum):
     @property
     def target_type(self):
         return self.value[1]
+
+    @property
+    def target_type_name(self):
+        _type = self.target_type
+        if isinstance(_type, tuple):
+            return tuple(t.__name__ for t in _type)
+        else:
+            return _type.__name__
