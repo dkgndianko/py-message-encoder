@@ -32,3 +32,9 @@ class FixedLengthEncoderTest(EncoderTest):
     def test_decode_(self):
         self.assertShouldDecodeSuccess("D", "D")
         self.assertShouldDecodeSuccess(" AI", "AI", flavor=(3,))
+
+    @with_flavor(2)
+    def test_failing_to_decode(self):
+        self.assertShouldRaiseWhenDecoding("DK", AssertionError)
+        self.assertCannotDecode([45, "this is nasty"])
+        self.assertShouldRaiseWhenDecoding([45, "this is nasty"], AssertionError)

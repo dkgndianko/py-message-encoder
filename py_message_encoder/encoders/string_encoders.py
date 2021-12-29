@@ -2,7 +2,7 @@ from typing import Tuple, Any
 
 from py_message_encoder.encoders import PartialEncoder
 from py_message_encoder.message_types import MessageType
-from py_message_encoder.utilities import left_pad, custom_base_64
+from py_message_encoder.utilities import left_pad, custom_unsigned_base_64
 
 
 class StringEncoderMixin:
@@ -38,11 +38,12 @@ class FixedLengthEncoder(StringEncoderMixin, PartialEncoder):
         return f"Fixed Length String Encoder ({self._length})"
 
 
-class VariableLengthEncoder(PartialEncoder, StringEncoderMixin):
-    def __init__(self, length_digits):
-        super(VariableLengthEncoder, self).__init__(MessageType.VARIABLE_LENGTH_STRING)
+class VariableLengthEncoder(StringEncoderMixin, PartialEncoder):
+    def __init__(self, length_digits: int):
+        assert length_digits > 0, "Length should be greater than 0"
+        PartialEncoder.__init__(self, MessageType.VARIABLE_LENGTH_STRING)
         self.length_digits = length_digits
-        self._max_length = custom_base_64.alphabet_len ** self.length_digits - 1
+        self._max_length = custom_unsigned_base_64.max_encodable_with_len(self.length_digits)
         self._max_global_length = self.length_digits + self._max_length
 
     def max_length(self):
@@ -55,16 +56,16 @@ class VariableLengthEncoder(PartialEncoder, StringEncoderMixin):
         return self._max_global_length
 
     def encode_value(self, value: str) -> str:
-        _len = custom_base_64.encode(len(value))
-        _len = left_pad(str(_len), self.length_digits, custom_base_64.zero)
+        _len = custom_unsigned_base_64.encode(len(value))
+        _len = left_pad(str(_len), self.length_digits, custom_unsigned_base_64.zero)
         return f"{_len}{value}"
 
     def decode_value(self, value: str) -> Tuple[str, int]:
         _len = value[:self.length_digits]
-        _len = custom_base_64.decode(_len)
+        _len = custom_unsigned_base_64.decode(_len)
         _value = value[self.length_digits:_len + 1]
         if len(_value) != _len:
-            raise ValueError(f"{len(_value)} != {_len}")
+            raise ValueError(f"Length should be {_len}, but only {len(_value)} was read.")
         return _value, _len + self.length_digits
 
     def __str__(self):
