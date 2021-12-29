@@ -25,5 +25,16 @@ class MessageHeader:
             mh.set_presence(i, c == "1")
         return mh
 
+    def __eq__(self, other):
+        if not isinstance(other, MessageHeader):
+            return False
+        if self.number_of_parts != other.number_of_parts:
+            return False
+        return all(s == other.state[p] for p, s in enumerate(self.state))
+
+
+    def __repr__(self):
+        return self.__str__()
+
     def __str__(self):
         return self.dump()

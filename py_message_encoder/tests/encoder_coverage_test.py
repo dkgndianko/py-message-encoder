@@ -2,6 +2,7 @@ import inspect
 from unittest import TestCase
 
 from py_message_encoder.encoders import PartialEncoder
+from py_message_encoder.encoders.integer_encoders import IntFixedLengthEncoderMixin
 from py_message_encoder.tests.encoder_test import EncoderTest
 from py_message_encoder.tests.utils import get_objects_by_condition
 
@@ -29,7 +30,7 @@ def _is_encoder_test_class(t):
 
 
 EXCLUDED_ENCODERS = [
-
+    IntFixedLengthEncoderMixin
 ]
 
 

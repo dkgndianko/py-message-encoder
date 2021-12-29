@@ -22,8 +22,25 @@ class MessageBody:
         for key, value in values.items():
             self[key] = value
 
+    def reset(self):
+        self.state = {}
+
     def fields_count(self):
         return len(self.field_names)
 
+    def __repr__(self):
+        return self.__str__()
+
     def __str__(self):
         return str(self.state)
+
+    def __eq__(self, other):
+        if isinstance(other, dict):
+            return self.state == other
+        if not isinstance(other, MessageBody):
+            return False
+        if self.fields_count() != other.fields_count():
+            return False
+        if self.field_names != other.field_names:
+            return False
+        return self.state == other.state
