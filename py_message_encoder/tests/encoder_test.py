@@ -15,6 +15,9 @@ class EncoderTest(TestCase):
             cls.INSTANCES = {}
         if flavor is None:
             flavor = cls.CURRENT_FLAVOR
+        if isinstance(flavor, int):
+            flavor = get_flavor(cls, flavor)
+        assert isinstance(flavor, tuple), f"Was expecting flavor to be a tuple, but got {type(flavor).__name__}."
         _flavor = hash(flavor)
         try:
             instance = cls.INSTANCES[_flavor]
@@ -110,10 +113,7 @@ def with_flavor(flavor: int):
         def new_method(self: EncoderTest):
             clazz = type(self)
             flavor_backup = clazz.CURRENT_FLAVOR
-            try:
-                clazz.CURRENT_FLAVOR = clazz.FLAVORS[flavor]
-            except IndexError:
-                raise ValueError(f"Not such flavor at index {flavor}")
+            clazz.CURRENT_FLAVOR = get_flavor(clazz, flavor)
             try:
                 method(self)
             finally:
@@ -122,3 +122,10 @@ def with_flavor(flavor: int):
         return new_method
 
     return annotation
+
+
+def get_flavor(clazz, flavor_index):
+    try:
+        return clazz.FLAVORS[flavor_index]
+    except IndexError:
+        raise ValueError(f"Not such flavor at index {flavor_index}")
