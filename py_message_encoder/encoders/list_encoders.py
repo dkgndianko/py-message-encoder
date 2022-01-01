@@ -14,20 +14,23 @@ class HomogenousListEncoder(PartialEncoder):
     def min_length(self):
         return big_int.min_length()  # empty list
 
-    # def can_encode(self, value: Any) -> Tuple[bool, str]:
-    #     # TODO 1: think about other iterables
-    #     #      2: verify if each element is encodable (self.base_encoder.can_encode(e) for e in value)
-    #     return isinstance(value, list), "Can only encode lists"
+    def can_encode(self, value: Any) -> Tuple[bool, str]:
+        # TODO 1: think about other iterables
+        #      2: verify if each element is encodable (self.base_encoder.can_encode(e) for e in value)
+        return isinstance(value, list), "Can only encode lists"
 
     def encode_value(self, value: List) -> str:
         _len = big_int.encode(len(value))
         return _len + "".join(self.base_encoder.encode(v) for v in value)
 
-    def decode_value(self, value: str) -> Tuple[Any, int]:
+    def decode_value(self, value: str) -> Tuple[List[Any], int]:
         result = []
         _len, consumed = big_int.decode_value(value)
         for i in range(_len):
-            v, _consumed = self.base_encoder.decode_value(value[consumed:])
+            try:
+                v, _consumed = self.base_encoder.decode_value(value[consumed:])
+            except (ValueError, AssertionError) as e:
+                raise ValueError(f"Error when decoding item {i+1}/{_len} of list. {e}") from e
             consumed += _consumed
             result.append(v)
         return result, consumed
