@@ -31,7 +31,8 @@ class PartialEncoder(ABC):
         _val_len = len(value)
         assert _val_len >= _min_len, f"Value should be a str and have at least have {_min_len} characters."
         decoded, _len_consumed = self.decode_value(value)
-        assert (_min_len <= _len_consumed <= _val_len), f"cannot consumes less than {_min_len} or more than {_val_len} characters."
+        assert (_min_len <= _len_consumed <= _val_len), f"cannot consumes less than {_min_len} or more than {_val_len} " \
+                                                        f"characters ({_len_consumed})."
         return decoded, value[_len_consumed:]
 
     def encode(self, value) -> str:

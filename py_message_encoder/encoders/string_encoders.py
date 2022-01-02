@@ -61,12 +61,14 @@ class VariableLengthEncoder(StringEncoderMixin, PartialEncoder):
         return f"{_len}{value}"
 
     def decode_value(self, value: str) -> Tuple[str, int]:
-        _len = value[:self.length_digits]
+        _len_digits = self.length_digits
+        assert len(value) >= _len_digits, f"Should at least have {_len_digits} characters. But only {len(value)}."
+        _len = value[:_len_digits]
         _len = custom_unsigned_base_64.decode(_len)
-        _value = value[self.length_digits:_len + 1]
+        _value = value[_len_digits: _len_digits + _len]
         if len(_value) != _len:
             raise ValueError(f"Length should be {_len}, but only {len(_value)} was read.")
-        return _value, _len + self.length_digits
+        return _value, _len + _len_digits
 
     def __str__(self):
         return f"Variable Length String Encoder (length digits: {self.length_digits}, max length: {self._max_length}) "
