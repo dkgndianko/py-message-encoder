@@ -4,7 +4,7 @@ from py_message_encoder.body import MessageBody
 from py_message_encoder.encoders.boolean_encoder import BooleanEncoder
 from py_message_encoder.encoders.date_encoders import DateEncoder, DateTimeEncoder, TimeEncoder
 from py_message_encoder.encoders.integer_encoders import UnsignedIntFixedLengthEncoder, IntegerVarLengthEncoder
-from py_message_encoder.encoders.message_body_encoder import BodyEncoder, MessageField, FieldMapping
+from py_message_encoder.encoders.high_order_encoders.message_body_encoder import BodyEncoder, MessageField, FieldMapping
 from py_message_encoder.encoders.string_encoders import LVAR, FixedLengthEncoder
 from py_message_encoder.tests.encoder_test import EncoderTest
 

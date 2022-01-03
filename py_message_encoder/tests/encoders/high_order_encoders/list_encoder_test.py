@@ -1,6 +1,6 @@
 from py_message_encoder.encoders.integer_encoders import big_int, unsigned_small_int
-from py_message_encoder.encoders.list_encoders import HomogenousListEncoder
-from py_message_encoder.encoders.message_body_encoder import BodyEncoder, FieldMapping, MessageField
+from py_message_encoder.encoders.high_order_encoders.list_encoders import HomogenousListEncoder
+from py_message_encoder.encoders.high_order_encoders.message_body_encoder import BodyEncoder, FieldMapping, MessageField
 from py_message_encoder.encoders.string_encoders import LLVAR, LVAR
 from py_message_encoder.tests.encoder_test import EncoderTest, with_flavor
 

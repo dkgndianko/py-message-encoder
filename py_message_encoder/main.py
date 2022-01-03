@@ -8,7 +8,7 @@ from py_message_encoder.encoders.date_encoders import date_encoder, time_encoder
 from py_message_encoder.encoders.float_encoders import float_encoder, FloatEncoder
 from py_message_encoder.encoders.integer_encoders import small_int, _small_int, big_int, IntFixedLengthEncoder, \
     _IntFixedLengthEncoder, IntegerVarLengthEncoder
-from py_message_encoder.encoders.message_body_encoder import FieldMapping, MessageField, BodyEncoder
+from py_message_encoder.encoders.high_order_encoders.message_body_encoder import FieldMapping, MessageField, BodyEncoder
 from py_message_encoder.encoders.message_header_encoder import header_encoder, MessageHeaderEncoder
 from py_message_encoder.header import MessageHeader
 from .encoders.boolean_encoder import BooleanEncoder
